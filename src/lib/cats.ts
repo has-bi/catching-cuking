@@ -14,7 +14,12 @@ export async function getCats(): Promise<Cat[]> {
     .from("cats")
     .select("*")
     .order("created_at", { ascending: false });
-  if (error) throw error;
+  if (error) {
+    // Don't fail the build or the whole page when the DB is unreachable or the
+    // schema isn't set up yet; show an empty gallery and leave a trace in the logs.
+    console.error("getCats failed:", error.message);
+    return [];
+  }
   return data;
 }
 
